@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Emergency Call Pattern Analysis</title>
+<style>
+:root{--navy:#10213b;--blue:#246bfd;--bg:#f3f6fb;--text:#17243a;--muted:#6b7890;--red:#e64b4b;--green:#15966a;--card:#fff}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
+header{background:linear-gradient(120deg,#10213b,#1c4780);color:#fff;padding:25px 5%;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+header h1{font-size:clamp(22px,3vw,32px);margin:0 0 8px}header p{margin:0;color:#dbe8ff}.badge{background:#ffffff20;border:1px solid #ffffff55;padding:9px 13px;border-radius:20px;font-size:13px}
+main{max-width:1200px;margin:24px auto;padding:0 18px}.notice{background:#fff8df;border:1px solid #f0d987;border-radius:10px;padding:12px 15px;color:#6b5311;font-size:13px;margin-bottom:20px}
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px;margin-bottom:20px}.card,.panel{background:var(--card);border-radius:14px;padding:19px;box-shadow:0 5px 18px #15284a0a;border:1px solid #e8edf5}
+.metric-label{font-size:13px;color:var(--muted)}.metric{font-size:30px;font-weight:700;margin:10px 0 5px}.sub{font-size:12px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:1.25fr 1fr;gap:18px}.panel h2{font-size:18px;margin:0 0 6px}.panel p{font-size:13px;color:var(--muted);margin:0 0 15px}
+.filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}.filters label{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:8px}.filters select,.filters input{padding:10px;border:1px solid #d5deeb;border-radius:8px;background:white;color:var(--text)}
+button{background:var(--blue);border:0;border-radius:8px;color:white;padding:10px 15px;cursor:pointer;font-weight:600}button:hover{filter:brightness(.93)}
+.chart{height:220px;display:flex;align-items:end;gap:12px;padding:15px 6px 25px;border-bottom:1px solid #dfe6f0;position:relative}.bar-wrap{height:100%;flex:1;display:flex;align-items:end;justify-content:center;position:relative}.bar{width:min(42px,70%);background:linear-gradient(#5e94ff,#246bfd);border-radius:7px 7px 0 0;min-height:5px;position:relative}.bar span{position:absolute;top:-22px;left:50%;transform:translateX(-50%);font-size:11px;color:#52617a}.bar-label{position:absolute;bottom:-22px;font-size:11px;color:#6b7890}
+.type-list{display:grid;gap:15px}.type-row{display:grid;grid-template-columns:80px 1fr 35px;gap:10px;align-items:center;font-size:13px}.track{height:10px;border-radius:10px;background:#edf1f7;overflow:hidden}.fill{height:100%;border-radius:10px;background:#246bfd}.type-row:nth-child(2) .fill{background:#f59b35}.type-row:nth-child(3) .fill{background:#e64b4b}.type-row:nth-child(4) .fill{background:#15966a}.type-row:nth-child(5) .fill{background:#8b63d9}
+.table-wrap{overflow:auto;margin-top:18px}.table-wrap h2{margin-bottom:12px}table{border-collapse:collapse;width:100%;font-size:13px;min-width:600px}th,td{text-align:left;padding:12px;border-bottom:1px solid #edf0f6}th{background:#f7f9fc;color:#5f6e84} .pill{padding:5px 8px;border-radius:20px;font-size:11px;background:#e5f7ef;color:#147b57}.pill.medium{background:#fff1db;color:#99620b}.pill.slow{background:#ffe8e8;color:#b72e2e}
+footer{text-align:center;color:#738097;font-size:12px;padding:25px}
+@media(max-width:850px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.grid{grid-template-columns:1fr}}
+@media(max-width:460px){.cards{grid-template-columns:1fr 1fr}.card{padding:14px}.metric{font-size:24px}.chart{gap:5px}}
+</style>
+</head>
+<body>
+<header>
+  <div><h1>🚨 Emergency Call Pattern Analysis</h1><p>Analyzing Emergency Patterns from 911 Calls</p></div>
+  <span class="badge">Student Project Dashboard</span>
+</header>
+<main>
+  <div class="notice"><strong>Demo data:</strong> This website uses sample values for presentation only, not live emergency-service data. Replace them with an approved dataset for real analysis.</div>
+  <div class="filters">
+    <label>Incident type
+      <select id="typeFilter"><option value="All">All types</option><option>Medical</option><option>Fire</option><option>Police</option><option>Traffic</option><option>Other</option></select>
+    </label>
+    <label>Day
+      <select id="dayFilter"><option value="All">All days</option><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option><option>Saturday</option><option>Sunday</option></select>
+    </label>
+    <button onclick="applyFilters()">Apply filters</button>
+    <button onclick="resetFilters()" style="background:#52617a">Reset</button>
+  </div>
+  <section class="cards">
+    <div class="card"><div class="metric-label">Total sample calls</div><div class="metric" id="total">1,248</div><div class="sub">In the demo dataset</div></div>
+    <div class="card"><div class="metric-label">Most common type</div><div class="metric" id="common">Medical</div><div class="sub">By sample call count</div></div>
+    <div class="card"><div class="metric-label">Peak hour</div><div class="metric" id="peak">6 PM</div><div class="sub">Highest sample call volume</div></div>
+    <div class="card"><div class="metric-label">Average response</div><div class="metric" id="response">8.4 min</div><div class="sub">Illustrative sample value</div></div>
+  </section>
+  <section class="grid">
+    <div class="panel"><h2>Calls by hour</h2><p>Sample call volume across selected time periods</p><div class="chart" id="hourChart"></div></div>
+    <div class="panel"><h2>Calls by emergency type</h2><p>Distribution in the illustrative dataset</p><div class="type-list" id="typeChart"></div></div>
+    <div class="panel"><h2>What the patterns may tell us</h2><p>Planning insights to discuss during your project viva</p>
+      <ul style="padding-left:19px;line-height:1.8;font-size:14px">
+        <li>Identify time periods with higher call demand.</li><li>Compare medical, fire, police and traffic incidents.</li><li>Use location clusters to explore possible hotspots.</li><li>Support staffing and resource planning; do not replace dispatchers.</li>
+      </ul>
+    </div>
+    <div class="panel"><h2>Project technology</h2><p>Tools described in the project presentation</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><span class="badge" style="background:#eaf1ff;color:#2458a7;border:0">Python</span><span class="badge" style="background:#eaf1ff;color:#2458a7;border:0">Pandas</span><span class="badge" style="background:#eaf1ff;color:#2458a7;border:0">NumPy</span><span class="badge" style="background:#eaf1ff;color:#2458a7;border:0">Matplotlib</span><span class="badge" style="background:#eaf1ff;color:#2458a7;border:0">Scikit-learn</span><span class="badge" style="background:#eaf1ff;color:#2458a7;border:0">SQLite</span></div>
+      <p style="margin-top:16px">Workflow: Collect data → Clean data → Store records → Analyze patterns → Visualize results.</p>
+    </div>
+  </section>
+  <section class="panel table-wrap"><h2>Example emergency call records</h2><p>Illustrative records to demonstrate the website layout</p>
+    <table><thead><tr><th>Call ID</th><th>Day</th><th>Time</th><th>Incident type</th><th>Area</th><th>Response category</th></tr></thead><tbody id="records"></tbody></table>
+  </section>
+</main>
+<footer>Analyzing Emergency Patterns from 911 Calls · Academic demonstration · Sample data only</footer>
+<script>
+const records=[
+{id:"C1001",day:"Monday",time:"08:15 AM",hour:8,type:"Medical",area:"Zone A",response:"Fast"},
+{id:"C1002",day:"Monday",time:"06:20 PM",hour:18,type:"Traffic",area:"Zone B",response:"Medium"},
+{id:"C1003",day:"Tuesday",time:"11:45 AM",hour:11,type:"Police",area:"Zone C",response:"Fast"},
+{id:"C1004",day:"Wednesday",time:"07:10 PM",hour:19,type:"Medical",area:"Zone A",response:"Slow"},
+{id:"C1005",day:"Thursday",time:"02:30 PM",hour:14,type:"Fire",area:"Zone D",response:"Medium"},
+{id:"C1006",day:"Friday",time:"06:05 PM",hour:18,type:"Police",area:"Zone B",response:"Fast"},
+{id:"C1007",day:"Saturday",time:"09:25 PM",hour:21,type:"Other",area:"Zone C",response:"Medium"},
+{id:"C1008",day:"Sunday",time:"05:40 PM",hour:17,type:"Medical",area:"Zone A",response:"Fast"},
+{id:"C1009",day:"Tuesday",time:"10:10 AM",hour:10,type:"Traffic",area:"Zone D",response:"Slow"},
+{id:"C1010",day:"Friday",time:"01:50 PM",hour:13,type:"Fire",area:"Zone B",response:"Medium"}
+];
+const hours=[["6 AM",24],["9 AM",45],["12 PM",63],["3 PM",72],["6 PM",100],["9 PM",58]];
+function applyFilters(){
+ const type=document.getElementById('typeFilter').value, day=document.getElementById('dayFilter').value;
+ const filtered=records.filter(r=>(type==='All'||r.type===type)&&(day==='All'||r.day===day));
+ document.getElementById('records').innerHTML=filtered.map(r=>`<tr><td>${r.id}</td><td>${r.day}</td><td>${r.time}</td><td>${r.type}</td><td>${r.area}</td><td><span class="pill ${r.response.toLowerCase()}">${r.response}</span></td></tr>`).join('')||'<tr><td colspan="6">No sample records match these filters.</td></tr>';
+ const counts={Medical:0,Fire:0,Police:0,Traffic:0,Other:0}; filtered.forEach(r=>counts[r.type]++);
+ const max=Math.max(1,...Object.values(counts)); document.getElementById('typeChart').innerHTML=Object.entries(counts).map(([k,v])=>`<div class="type-row"><span>${k}</span><div class="track"><div class="fill" style="width:${v/max*100}%"></div></div><strong>${v}</strong></div>`).join('');
+ document.getElementById('total').textContent=filtered.length.toLocaleString();
+ document.getElementById('common').textContent=filtered.length?Object.entries(counts).sort((a,b)=>b[1]-a[1])[0][0]:'—';
+ document.getElementById('response').textContent=filtered.length?(filtered.reduce((s,r)=>s+({Fast:4,Medium:8,Slow:14}[r.response]),0)/filtered.length).toFixed(1)+' min':'—';
+}
+function resetFilters(){document.getElementById('typeFilter').value='All';document.getElementById('dayFilter').value='All';applyFilters()}
+document.getElementById('hourChart').innerHTML=hours.map(([label,val])=>`<div class="bar-wrap"><div class="bar" style="height:${val}%"><span>${val}</span></div><div class="bar-label">${label}</div></div>`).join('');
+applyFilters();
+</script>
+</body></html>
